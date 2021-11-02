@@ -69,6 +69,10 @@ class PackageManagerServiceProvider extends AbstractServiceProvider
         /** @var Dispatcher $events */
         $events = $container->make('events');
 
+        $events->listen(\Illuminate\Database\Events\QueryExecuted::class, function ($event) use ($container) {
+            $container->make(\Psr\Log\LoggerInterface::class)->debug($event->sql);
+        });
+
         $events->listen(
             [Updated::class],
             function (Updated $event) use ($container) {
