@@ -88,8 +88,8 @@ class MinorUpdateTest extends TestCase
         $this->assertPackageVersion("flarum/dummy-extension", "*");
         $this->assertEquals([
             'flarum/core',
-            'flarum/tags',
-            'flarum/lang-english'
+            'flarum/lang-english',
+            'flarum/tags'
         ], $lastUpdateRun->for(FlarumUpdated::MINOR)->get()['limitedPackages']);
     }
 }
