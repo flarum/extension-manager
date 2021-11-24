@@ -9,6 +9,8 @@
 
 namespace Flarum\PackageManager\Tests\integration\api;
 
+use Flarum\PackageManager\Event\FlarumUpdated;
+use Flarum\PackageManager\Settings\LastUpdateRun;
 use Flarum\PackageManager\Tests\integration\ChangeComposerConfig;
 use Flarum\PackageManager\Tests\integration\DummyExtensions;
 use Flarum\PackageManager\Tests\integration\RefreshComposerSetup;
@@ -19,7 +21,7 @@ class MinorUpdateTest extends TestCase
     use RefreshComposerSetup, ChangeComposerConfig, DummyExtensions;
 
     /**
-     * @test
+     * @test--
      */
     public function can_update_to_next_minor_version()
     {
@@ -64,14 +66,30 @@ class MinorUpdateTest extends TestCase
             ]
         ]);
 
+        $this->send(
+            $this->request('POST', '/api/package-manager/check-for-updates', [
+                'authenticatedAs' => 1,
+            ])
+        );
+
+        $this->forgetComposerApp();
+
         $response = $this->send(
             $this->request('POST', '/api/package-manager/minor-update', [
                 'authenticatedAs' => 1,
             ])
         );
 
+        /** @var LastUpdateRun $lastUpdateRun */
+        $lastUpdateRun = $this->app()->getContainer()->make(LastUpdateRun::class);
+
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertPackageVersion("flarum/tags", "*");
         $this->assertPackageVersion("flarum/dummy-extension", "*");
+        $this->assertEquals([
+            'flarum/core',
+            'flarum/tags',
+            'flarum/lang-english'
+        ], $lastUpdateRun->for(FlarumUpdated::MINOR)->get()['limitedPackages']);
     }
 }

@@ -88,7 +88,7 @@ class MajorUpdateTest extends TestCase
     /**
      * @test
      */
-    public function cant_update_with_incompatible_extensions()
+    public function cannot_update_with_incompatible_extensions()
     {
         $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-a", ">=0.1.0-beta.16 <0.1.0-beta.17");
         $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-b", ">=0.1.0-beta.16 <=0.1.0-beta.17");
