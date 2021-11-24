@@ -19,7 +19,7 @@ class MajorUpdateTest extends TestCase
     use RefreshComposerSetup, ChangeComposerConfig, DummyExtensions;
 
     /**
-     * @test--
+     * @test
      */
     public function cannot_update_when_no_update_check_ran()
     {
@@ -44,7 +44,7 @@ class MajorUpdateTest extends TestCase
     }
 
     /**
-     * @test--
+     * @test
      */
     public function can_update_when_major_update_available()
     {
