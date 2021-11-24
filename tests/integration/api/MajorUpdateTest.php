@@ -40,7 +40,7 @@ class MajorUpdateTest extends TestCase
         );
 
         $this->assertEquals(409, $response->getStatusCode());
-        $this->assertEquals('no_new_major_version', json_decode($response->getBody()->getContents(), true)['errors'][0]['code']);
+        $this->assertEquals('no_new_major_version', $this->errorDetails($response)['code']);
     }
 
     /**
@@ -117,7 +117,7 @@ class MajorUpdateTest extends TestCase
         );
 
         $this->assertEquals(409, $response->getStatusCode());
-        $this->assertEquals('extensions_incompatible_with_new_major', $this->errorGuessedCause($response));
+        $this->assertEquals('extensions_incompatible_with_new_major', $this->errorDetails($response)['guessed_cause']);
         $this->assertEquals([
             'flarum/dummy-incompatible-extension-a',
             'flarum/dummy-incompatible-extension-b',
