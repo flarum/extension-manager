@@ -40,12 +40,18 @@ class SetupComposer
 
     public function run()
     {
-        $filePath = $this->tmpDir().'/composer.json';
+        $composerJson = $this->tmpDir().'/composer.json';
+        $composerLock = $this->tmpDir().'/composer.lock';
+        $packages = $this->tmpDir().'/packages';
 
-        file_put_contents($filePath, json_encode($this->config, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+        file_put_contents($composerJson, json_encode($this->config, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
-        if (! file_exists($this->tmpDir().'/packages')) {
-            mkdir($this->tmpDir().'/packages');
+        if (! file_exists($packages)) {
+            mkdir($packages);
+        }
+
+        if (file_exists($composerLock)) {
+            unlink($composerLock);
         }
     }
 }

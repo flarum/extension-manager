@@ -47,4 +47,9 @@ trait RefreshComposerSetup
 
         rmdir($dir);
     }
+
+    protected function forgetComposerApp(): void
+    {
+        $this->app()->getContainer()->instance(ComposerAdapter::class, null);
+    }
 }

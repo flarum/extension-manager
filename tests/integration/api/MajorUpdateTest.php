@@ -58,11 +58,13 @@ class MajorUpdateTest extends TestCase
             'minimum-stability' => 'beta',
         ]);
 
-        $this->send(
+        $lastUpdateCheck = $this->send(
             $this->request('POST', '/api/package-manager/check-for-updates', [
                 'authenticatedAs' => 1,
             ])
         );
+
+        $this->forgetComposerApp();
 
         $response = $this->send(
             $this->request('POST', '/api/package-manager/major-update', [
@@ -70,8 +72,15 @@ class MajorUpdateTest extends TestCase
             ])
         );
 
+        $newMinorCoreVersion = array_filter(
+            json_decode((string) $lastUpdateCheck->getBody(), true)['updates']['installed'],
+            function ($package) {
+                return $package['name'] === 'flarum/core';
+            }
+        )[0]['latest-major'];
+
         $this->assertEquals(204, $response->getStatusCode());
-        $this->assertPackageVersion("flarum/core", "^1.0.0");
+        $this->assertPackageVersion("flarum/core", str_replace('v', '^', $newMinorCoreVersion));
         $this->assertPackageVersion("flarum/tags", "*");
         $this->assertPackageVersion("flarum/dummy-compatible-extension", "*");
     }
@@ -81,13 +90,13 @@ class MajorUpdateTest extends TestCase
      */
     public function cant_update_with_incompatible_extensions()
     {
-        $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-a", ">=0.1.0-beta.15 <0.1.0-beta.16");
-        $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-b", ">=0.1.0-beta.15 <=0.1.0-beta.16");
-        $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-c", "0.1.0-beta.15");
+        $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-a", ">=0.1.0-beta.16 <0.1.0-beta.17");
+        $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-b", ">=0.1.0-beta.16 <=0.1.0-beta.17");
+        $this->makeDummyExtensionCompatibleWith("flarum/dummy-incompatible-extension-c", "0.1.0-beta.16");
         $this->setComposerConfig([
             'require' => [
-                'flarum/core' => '^0.1.0-beta.15',
-                'flarum/tags' => '^0.1.0-beta.15',
+                'flarum/core' => '^0.1.0-beta.16',
+                'flarum/tags' => '^0.1.0-beta.16',
                 'flarum/dummy-incompatible-extension-a' => '^1.0.0',
                 'flarum/dummy-incompatible-extension-b' => '^1.0.0',
                 'flarum/dummy-incompatible-extension-c' => '^1.0.0',
